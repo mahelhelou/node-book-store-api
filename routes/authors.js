@@ -1,10 +1,10 @@
 const express = require('express')
 const router = express.Router()
+const asyncHandler = require('express-async-handler')
 
 const { Author } = require('../models/Author')
-
 const { validateAuthorInputs } = require('../validation')
-const authorsData = require('../data/authorsData')
+// const authorsData = require('../data/authorsData')
 
 /**
  * @desc Retrieve All Authors
@@ -13,22 +13,32 @@ const authorsData = require('../data/authorsData')
  * @access public
  * @returns Array of author objects
  */
+// With regular Try-Catch block
 router.get('/', async (req, res) => {
 	// Local DB file
 	// res.status(200).json(authorsData)
 
 	// MongoDB
 	try {
-		// const authorsList = await Author.find().sort({ firstName: 1 }) // ASCE
-		// const authorsList = await Author.find().sort({ firstName: -1 }) // DESC
-		// const authorsList = await Author.find().sort({ firstName: 1 }).select('firstName lastName') // View only first name and last name
-		const authorsList = await Author.find().sort({ firstName: 1 }).select('firstName lastName -_id') // Exclude id
-		res.status(200).json(authorsList)
+		// const authors = await Author.find().sort({ firstName: 1 }) // ASCE
+		// const authors = await Author.find().sort({ firstName: -1 }) // DESC
+		// const authors = await Author.find().sort({ firstName: 1 }).select('firstName lastName') // View only first name and last name
+		const authors = await Author.find().sort({ firstName: 1 }).select('firstName lastName -_id') // Exclude id
+		res.status(200).json(authors)
 	} catch (error) {
 		console.log('Error! ', error)
 		res.status(500).json({ message: 'Please try again later.' })
 	}
 })
+
+// With express-async-handler npm package
+router.get(
+	'/v2',
+	asyncHandler(async (req, res) => {
+		const authors = await Author.find()
+		res.status(200).json(authors)
+	})
+)
 
 /**
  * @desc Get Author Details By Id
@@ -94,7 +104,7 @@ router.post('/', async (req, res) => {
 		})
 
 		const result = await author.save()
-		res.status(201).json(result)
+		res.status(201).json(result) // 201: Created successfully
 	} catch (error) {
 		console.log('Error! ', error)
 		res.status(400).json({ message: 'Error saving author to the DB.' })

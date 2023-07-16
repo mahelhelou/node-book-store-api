@@ -1,8 +1,10 @@
 const express = require('express')
 const router = express.Router()
+const asyncHandler = require('express-async-handler')
 
+const { Book } = require('../models/Book')
 const { validateBookInputs } = require('../validation')
-const booksData = require('../data/booksData')
+// const booksData = require('../data/booksData')
 
 /**
  * @desc Retrieve All Books
@@ -11,9 +13,13 @@ const booksData = require('../data/booksData')
  * @access public
  * @returns Array of book objects
  */
-router.get('/', (req, res) => {
-	res.json(booksData)
-})
+router.get(
+	'/',
+	asyncHandler(async (req, res) => {
+		const books = await Book.find().populate('author', ['_id', 'firstName', 'lastName'])
+		res.status(200).json(books)
+	})
+)
 
 /**
  * @desc Retrieve Book Details By ID
@@ -23,15 +29,18 @@ router.get('/', (req, res) => {
  * @returns Book details
  * @throws Error if the book is not found
  */
-router.get('/:id', (req, res) => {
-	const book = booksData.find(book => book.id === parseInt(req.params.id))
+router.get(
+	'/:id',
+	asyncHandler(async (req, res) => {
+		const book = await Book.findById(req.params.id)
 
-	if (book) {
-		res.status(200).json(book)
-	} else {
-		res.status(404).json({ message: 'Book not found!' })
-	}
-})
+		if (book) {
+			res.status(200).json(book)
+		} else {
+			res.status(404).json({ message: 'Book not found!' })
+		}
+	})
+)
 
 /**
  * @desc Create A New Book
@@ -41,31 +50,27 @@ router.get('/:id', (req, res) => {
  * @returns JSON of created book
  * @throws Error if the request inputs are invalid (JOI library)
  */
-router.post('/', (req, res) => {
-	/**
-	 * Postman: POST -> localhost:3000/api/books -> Body -> json (Not text)
-	 * Instead of manual check for request body (Title, author, description...), we can use Joi npm package (+7 millions download every week)
-	 */
-	const { error } = validateBookInputs(req.body)
+router.post(
+	'/',
+	asyncHandler(async (req, res) => {
+		const { error } = validateBookInputs(req.body)
 
-	if (error) {
-		// return res.status(400).json(error)
-		return res.status(400).json({ message: error.details[0].message })
-	}
+		if (error) {
+			return res.status(400).json({ message: error.details[0].message })
+		}
 
-	const book = {
-		id: booksData.length + 1,
-		title: req.body.title,
-		author: req.body.author,
-		description: req.body.description,
-		price: req.body.price,
-		cover: req.body.cover
-	}
+		const book = new Book({
+			title: req.body.title,
+			author: req.body.author,
+			description: req.body.description,
+			price: req.body.price,
+			cover: req.body.cover
+		})
 
-	// console.log(req.body) // UT
-	booksData.push(book)
-	res.status(201).json(book) // 201: Created successfully
-})
+		const result = await book.save()
+		res.status(201).json(result)
+	})
+)
 
 /**
  * @desc Update Book By ID
@@ -75,21 +80,37 @@ router.post('/', (req, res) => {
  * @returns Success message
  * @throws Error if the book is not found
  */
-router.put('/:id', (req, res) => {
-	const { error } = validateBookInputs(req.body, false)
+router.put(
+	'/:id',
+	asyncHandler(async (req, res) => {
+		const { error } = validateBookInputs(req.body, false)
 
-	if (error) {
-		return res.status(400).json({ message: error.details[0].message })
-	}
+		if (error) {
+			return res.status(400).json({ message: error.details[0].message })
+		}
 
-	const book = booksData.find(book => book.id === parseInt(req.params.id))
+		const book = await Book.findById(req.params.id)
 
-	if (book) {
-		res.status(200).json({ message: 'Book has been updated.' })
-	} else {
-		res.status(400).json({ message: 'Book not found.' })
-	}
-})
+		if (book) {
+			const updatedBook = await Book.findByIdAndUpdate(
+				req.params.id,
+				{
+					$set: {
+						title: req.body.title,
+						author: req.body.author,
+						description: req.body.description,
+						price: req.body.price,
+						cover: req.body.cover
+					}
+				},
+				{ new: true }
+			)
+			res.status(200).json(updatedBook)
+		} else {
+			res.status(400).json({ message: 'Book not found.' })
+		}
+	})
+)
 
 /**
  * @desc Delete A Book
@@ -99,14 +120,18 @@ router.put('/:id', (req, res) => {
  * @returns Success message
  * @throws Error if the book is not found
  */
-router.delete('/:id', (req, res) => {
-	const book = booksData.find(book => book.id === parseInt(req.params.id))
+router.delete(
+	'/:id',
+	asyncHandler(async (req, res) => {
+		const book = await Book.findById(req.params.id)
 
-	if (book) {
-		res.status(200).json({ message: 'Book has been deleted.' })
-	} else {
-		res.status(400).json({ message: 'Book not found.' })
-	}
-})
+		if (book) {
+			await Book.findByIdAndDelete(req.params.id)
+			res.status(200).json({ message: 'Book has been deleted.' })
+		} else {
+			res.status(400).json({ message: 'Book not found.' })
+		}
+	})
+)
 
 module.exports = router
