@@ -68,3 +68,25 @@ Example response body:
   ...
 ]
 ```
+
+## ChatGPT
+
+Here's my code for Express framework:
+
+```js
+exports.update = async (req, res) => {
+	const { error } = validation.validateUpdateAuthor(req.body, false)
+	if (error) {
+		return res.status(400).json({ message: error.details[0].message })
+	}
+}
+
+exports.delete = async (req, res) => {
+	const { error } = validation.validateUpdateAuthor(req.body, false)
+	if (error) {
+		return res.status(400).json({ message: error.details[0].message })
+	}
+}
+```
+
+My question is: How can I write a DRY code for many route handlers?

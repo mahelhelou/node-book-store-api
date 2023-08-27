@@ -7,6 +7,9 @@ const app = express()
 app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
 
+app.set('views', 'views')
+app.set('view engine', 'ejs')
+
 app.use('/api', router)
 
 // Errors handler

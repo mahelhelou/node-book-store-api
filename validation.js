@@ -76,5 +76,3 @@ exports.validateUpdateBook = reqInputs => {
 
 	return bookSchema.validate(reqInputs)
 }
-
-module.exports = { validateAuthorInputs, validateBookInputs, validateRegisterUser, validateLoginUser, validateUpdateUser }

@@ -2,7 +2,7 @@ const asyncHandler = require('express-async-handler')
 
 const Book = require('../models/Book')
 const validation = require('../validation')
-// const booksData = require('../data/booksData')
+// const booksData = require('../database/booksData')
 
 /**
  * @desc Create A New Book
@@ -37,8 +37,26 @@ exports.create = asyncHandler(async (req, res) => {
  * @access public
  * @returns Array of book objects
  */
-exports.list = asyncHandler(async (req, res) => {
-	const books = await Book.find().populate('author', ['_id', 'firstName', 'lastName'])
+exports.bookList = asyncHandler(async (req, res) => {
+	const { minPrice, maxPrice } = req.query
+
+	let books = await Book.find()
+	books = await Book.find({ price: 10 }) // 2 books
+	books = await Book.find({ price: { $eq: 10 } }) // Equal -> 2 books
+	books = await Book.find({ price: { $ne: 10 } }) // Not equal -> 9 books
+	books = await Book.find({ price: { $lt: 10 } }) // Less than 10
+	books = await Book.find({ price: { $lte: 10 } }) // Less than or equal 10
+	books = await Book.find({ price: { $gt: 10 } }) // Greater than 10
+	books = await Book.find({ price: { $gte: 10 } }) // Greater than or equal 10
+
+		.populate('author', ['_id', 'firstName', 'lastName'])
+
+	if (minPrice && maxPrice) {
+		books = await Book.find({ price: { $gte: minPrice, $lte: maxPrice } }).populate('author', ['_id', 'firstName', 'lastName'])
+	} else {
+		books = await Book.find().populate('author', ['_id', 'firstName', 'lastName'])
+	}
+
 	res.status(200).json(books)
 })
 
@@ -50,7 +68,7 @@ exports.list = asyncHandler(async (req, res) => {
  * @returns Book details
  * @throws Error if the book is not exists
  */
-exports.findById = asyncHandler(async (req, res) => {
+exports.bookById = asyncHandler(async (req, res) => {
 	const book = await Book.findById(req.params.id)
 	if (!book) {
 		return res.status(404).json({ message: '404! Book not found' })

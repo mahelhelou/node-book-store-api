@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const jwt = require('jsonwebtoken')
 
 const userSchema = mongoose.Schema(
 	{
@@ -31,6 +32,13 @@ const userSchema = mongoose.Schema(
 	},
 	{ timestamps: true }
 )
+
+// Generate token for logged in users (Use regular function to get benefit from (this))
+userSchema.methods.generateToken = function () {
+	return jwt.sign({ id: this._id, username: this.username }, process.env.JWT_SECRET_KEY, {
+		expiresIn: '30d'
+	})
+}
 
 const User = mongoose.model('User', userSchema)
 

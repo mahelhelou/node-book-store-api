@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler')
 const Author = require('../models/Author')
 const validation = require('../validation')
-// const authorsData = require('../data/authorsData')
+// const authorsData = require('../database/authorsData')
 
 /**
  * @desc Create A New Author
@@ -54,16 +54,16 @@ exports.create = async (req, res) => {
  */
 
 // With regular Try-Catch block
-exports.list = async (req, res) => {
+exports.authorList = async (req, res) => {
 	// Local DB file
 	// res.status(200).json(authorsData)
 
 	// MongoDB
 	try {
-		// const authors = await Author.find().sort({ firstName: 1 }) // ASCE
+		const authors = await Author.find().sort({ firstName: 1 }) // ASCE
 		// const authors = await Author.find().sort({ firstName: -1 }) // DESC
 		// const authors = await Author.find().sort({ firstName: 1 }).select('firstName lastName') // View only first name and last name
-		const authors = await Author.find().sort({ firstName: 1 }).select('firstName lastName -_id') // Exclude id
+		// const authors = await Author.find().sort({ firstName: 1 }).select('firstName lastName -_id') // Exclude id
 		res.status(200).json(authors)
 	} catch (error) {
 		console.log('Error! ', error)
@@ -72,7 +72,7 @@ exports.list = async (req, res) => {
 }
 
 // With express-async-handler npm package
-exports.list2 = asyncHandler(async (req, res) => {
+exports.authorList2 = asyncHandler(async (req, res) => {
 	const authors = await Author.find()
 	res.status(200).json(authors)
 })
@@ -85,7 +85,7 @@ exports.list2 = asyncHandler(async (req, res) => {
  * @returns Author details
  * @throws Error if the author not found
  */
-exports.findById = async (req, res) => {
+exports.authorById = async (req, res) => {
 	// Local DB file
 	// const author = authorsData.find(author => author.id === parseInt(req.params.id))
 

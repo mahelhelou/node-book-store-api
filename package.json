@@ -3,10 +3,11 @@
 	"version": "1.0.0",
 	"description": "",
 	"main": "index.js",
-	"type": "module",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "nodemon app"
+		"dev": "nodemon db",
+		"data:import": "node seeder",
+		"data:destroy": "node seeder -d"
 	},
 	"keywords": [],
 	"author": "",
@@ -14,6 +15,7 @@
 	"dependencies": {
 		"bcryptjs": "^2.4.3",
 		"dotenv": "^16.3.1",
+		"ejs": "^3.1.9",
 		"express": "^4.18.2",
 		"express-async-handler": "^1.2.0",
 		"joi": "^17.9.2",
@@ -21,6 +23,7 @@
 		"mongoose": "^7.3.4"
 	},
 	"devDependencies": {
+		"colors": "^1.4.0",
 		"nodemon": "^3.0.1"
 	}
 }

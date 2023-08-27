@@ -1,6 +1,5 @@
 const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
 
 const User = require('../models/User')
 const validation = require('../validation')
@@ -70,11 +69,20 @@ exports.login = asyncHandler(async (req, res) => {
 		return res.status(400).json({ message: 'Invalid email or password.' })
 	}
 
-	const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET_KEY, {
-		expiresIn: '30d'
-	})
+	const token = user.generateToken()
 	const { password, ...others } = user._doc
 	res.status(201).json({ ...others, token })
+})
+
+/**
+ * @desc Forgot Password
+ * @route /api/forgot-password
+ * @method GET
+ * @access public
+ * @returns Forgot password view
+ */
+exports.forgotPassword = asyncHandler((req, res) => {
+	res.render('forgot-password')
 })
 
 /**
