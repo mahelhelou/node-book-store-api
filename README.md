@@ -1,5 +1,8 @@
 # Book Store API With Node.js
 
+- Node.js is a non-blocking (Non-synchronous) technology. Because of this Node.js is very fast and it used in chatting apps.
+- Node.js is a cross platform.
+
 [Course](https://www.youtube.com/watch?v=CIYujbGpXZ8&list=PL5gCk5NdNx586mk_JOhe30dd59IgrFG_U)
 
 TODO: Work on updating user with JWT
@@ -68,25 +71,3 @@ Example response body:
   ...
 ]
 ```
-
-## ChatGPT
-
-Here's my code for Express framework:
-
-```js
-exports.update = async (req, res) => {
-	const { error } = validation.validateUpdateAuthor(req.body, false)
-	if (error) {
-		return res.status(400).json({ message: error.details[0].message })
-	}
-}
-
-exports.delete = async (req, res) => {
-	const { error } = validation.validateUpdateAuthor(req.body, false)
-	if (error) {
-		return res.status(400).json({ message: error.details[0].message })
-	}
-}
-```
-
-My question is: How can I write a DRY code for many route handlers?

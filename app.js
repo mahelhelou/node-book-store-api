@@ -4,8 +4,8 @@ const errorHandler = require('./middleware/errorHandler')
 
 const app = express()
 
-app.use(express.urlencoded({ extended: false }))
-app.use(express.json())
+app.use(express.urlencoded({ extended: false })) // accept data from client (browser)
+app.use(express.json()) // accept data from client (JSON format)
 
 app.set('views', 'views')
 app.set('view engine', 'ejs')

@@ -18,15 +18,25 @@ exports.create = asyncHandler(async (req, res) => {
 		return res.status(400).json({ message: error.details[0].message })
 	}
 
-	const book = new Book({
+	/* const book = new Book({
 		title: req.body.title,
-		author: req.body.author,
+	 	author: req.body.author,
 		description: req.body.description,
 		price: req.body.price,
 		cover: req.body.cover
+	}) */
+
+	const { title, author, description, price, cover } = req.body
+	const book = new Book({
+		// title: title, // Can be shorten with es6
+		title,
+		author,
+		description,
+		price,
+		cover
 	})
 
-	await book.save()
+	await book.save() // Save the book before viewing its details
 	res.status(201).json(book)
 })
 
@@ -66,7 +76,7 @@ exports.bookList = asyncHandler(async (req, res) => {
  * @method GET
  * @access public
  * @returns Book details
- * @throws Error if the book is not exists
+ * @throws Error if the book is not found
  */
 exports.bookById = asyncHandler(async (req, res) => {
 	const book = await Book.findById(req.params.id)
@@ -93,7 +103,7 @@ exports.update = asyncHandler(async (req, res) => {
 
 	const book = await Book.findById(req.params.id)
 	if (!book) {
-		return res.status(404).json({ message: '404! Book not found.' })
+		return res.status(404).json({ message: "404! Book isn't found!" })
 	}
 
 	const updatedBook = await Book.findByIdAndUpdate(
